@@ -1,0 +1,1634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Health Advisor</title>
+    <style>
+        :root {
+            --primary: #4285f4;
+            --primary-dark: #1a73e8;
+            --secondary: #34a853;
+            --warning: #fbbc05;
+            --danger: #ea4335;
+            --light: #f8f9fa;
+            --dark: #202124;
+            --gray: #5f6368;
+            --white: #ffffff;
+            --accent: #9333ea;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--light), #e8f0fe);
+            color: var(--dark);
+            line-height: 1.6;
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        header {
+            background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+            color: var(--white);
+            padding: 20px 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 30px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo i {
+            font-size: 2.2rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .logo h1 {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .theme-toggle, .voice-toggle {
+            background: transparent;
+            border: none;
+            color: var(--white);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+        }
+
+        .theme-toggle:hover, .voice-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        main {
+            margin-top: 40px;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 1024px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+            margin-bottom: 25px;
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--gray);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: #f9fafb;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 8px rgba(66, 133, 244, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: var(--white);
+        }
+
+        .btn-secondary:hover {
+            background: #2d9549;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: var(--white);
+        }
+
+        .btn-danger:hover {
+            background: #d62516;
+            transform: translateY(-2px);
+        }
+
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .symptoms-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .symptom-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bmi-calculator {
+            background: #e8f0fe;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .bmi-result {
+            margin-top: 15px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .health-metrics-chart {
+            width: 100%;
+            height: 300px;
+            margin-top: 25px;
+        }
+
+        .tab-navigation {
+            display: flex;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .tab-item {
+            padding: 12px 24px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--gray);
+            position: relative;
+        }
+
+        .tab-item.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .tab-item:hover {
+            color: var(--primary);
+            background: rgba(66, 133, 244, 0.1);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .recommendation-item {
+            border-left: 5px solid var(--primary);
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            background: #f3f8ff;
+            border-radius: 0 8px 8px 0;
+            animation: fadeInRight 0.5s ease-out;
+        }
+
+        @keyframes fadeInRight {
+            from { transform: translateX(20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .recommendation-title {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 8px;
+            font-size: 1.2rem;
+        }
+
+        .medication-reminder {
+            background: #fff8e1;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 25px;
+            border-left: 5px solid var(--warning);
+        }
+
+        .reminder-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .reminder-time {
+            font-weight: 600;
+            color: var(--warning);
+        }
+
+        .history-item {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+
+        .history-item:hover {
+            background: #f5f5f5;
+            transform: translateY(-2px);
+        }
+
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 25px;
+        }
+
+        .loader-spinner {
+            width: 48px;
+            height: 48px;
+            border: 5px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 5px solid var(--primary);
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 25px;
+            background: var(--primary);
+            color: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transform: translateY(100px);
+            opacity: 0;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .accessibility-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .font-size-controls, .language-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .font-size-btn, .language-btn {
+            padding: 8px 12px;
+            background: #e5e7eb;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .font-size-btn.active, .language-btn.active {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        body.large-font {
+            font-size: 18px;
+        }
+
+        body.x-large-font {
+            font-size: 22px;
+        }
+
+        .chat-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 25px;
+        }
+
+        .chat-messages {
+            max-height: 300px;
+            overflow-y: auto;
+            background: var(--white);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .chat-message {
+            margin: 10px 0;
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .user-message {
+            background: var(--primary);
+            color: var(--white);
+            margin-left: 25%;
+            margin-right: 10px;
+        }
+
+        .bot-message {
+            background: #e5e7eb;
+            color: var(--dark);
+            margin-right: 25%;
+            margin-left: 10px;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input input {
+            flex: 1;
+        }
+
+        .health-tips {
+            background: #ecfdf5;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 25px;
+            border-left: 5px solid var(--secondary);
+        }
+
+        .tip-item {
+            margin-bottom: 15px;
+            padding-left: 10px;
+            border-left: 3px solid var(--secondary);
+        }
+
+        .ai-assistant {
+            position: fixed;
+            bottom: 80px;
+            right: 30px;
+            background: var(--accent);
+            color: var(--white);
+            padding: 15px;
+            border-radius: 50%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        .ai-assistant:hover {
+            transform: scale(1.1);
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg, var(--dark), #2c2c2c);
+            color: var(--light);
+        }
+
+        body.dark-mode .card {
+            background: #2c2c2c;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark-mode input,
+        body.dark-mode select,
+        body.dark-mode textarea {
+            background: #3c3c3c;
+            border-color: #4c4c4c;
+            color: var(--light);
+        }
+
+        body.dark-mode .recommendation-item {
+            background: #2a3a5a;
+        }
+
+        body.dark-mode .medication-reminder {
+            background: #3c3520;
+        }
+
+        body.dark-mode .health-tips {
+            background: #2a3a5a;
+        }
+
+        body.dark-mode .chat-section {
+            background: #3c3c3c;
+        }
+
+        body.dark-mode .chat-messages {
+            background: #4c4c4c;
+        }
+
+        body.dark-mode .bot-message {
+            background: #5c5c5c;
+            color: var(--light);
+        }
+
+        @media print {
+            header, .sidebar, .actions, #addMedicationForm, .chat-section, .ai-assistant, .notification {
+                display: none;
+            }
+
+            body, .card {
+                background: white !important;
+                color: black !important;
+            }
+
+            main {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        .quick-replies {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+        flex-wrap: wrap;
+    }
+
+    .quick-replies button {
+        font-size: 0.9em;
+        padding: 8px 12px;
+    }
+
+    .typing-indicator {
+        display: inline-flex;
+        padding: 10px;
+        background: #f0f0f0;
+        border-radius: 15px;
+    }
+
+    .dot {
+        width: 8px;
+        height: 8px;
+        margin: 0 3px;
+        background: #ccc;
+        border-radius: 50%;
+        animation: bounce 1.4s infinite;
+    }
+
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bounce {
+        0%, 80%, 100% { transform: translateY(0); }
+        40% { transform: translateY(-5px); }
+    }
+
+    body.dark-mode .typing-indicator {
+        background: #3c3c3c;
+    }
+
+    body.dark-mode .dot {
+        background: #666;
+    }
+
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-heartbeat"></i>
+                <h1>Smart Health Advisor</h1>
+            </div>
+            <div class="header-controls">
+                <button id="voiceToggle" class="voice-toggle" title="Toggle Voice Input">
+                    <i class="fas fa-microphone"></i>
+                </button>
+                <button id="themeToggle" class="theme-toggle" title="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="accessibility-controls card">
+            <div class="font-size-controls">
+                <span>Font Size:</span>
+                <button id="normalFont" class="font-size-btn active">A</button>
+                <button id="largeFont" class="font-size-btn">A+</button>
+                <button id="xLargeFont" class="font-size-btn">A++</button>
+            </div>
+            <div class="language-controls">
+                <span>Language:</span>
+                <button id="langEn" class="language-btn active">EN</button>
+                <button id="langEs" class="language-btn">ES</button>
+                <button id="langFr" class="language-btn">FR</button>
+            </div>
+        </div>
+
+        <main>
+            <aside class="sidebar">
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-user-circle"></i> User Profile</h2>
+                    <form id="userProfileForm">
+                        <div class="form-group">
+                            <label for="userName">Name</label>
+                            <input type="text" id="userName" placeholder="Enter your name">
+                        </div>
+                        <div class="form-group">
+                            <label for="userAge">Age</label>
+                            <input type="number" id="userAge" placeholder="Years" min="1" max="120">
+                        </div>
+                        <div class="form-group">
+                            <label for="userGender">Gender</label>
+                            <select id="userGender">
+                                <option value="">Select</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="userHeight">Height (cm)</label>
+                            <input type="number" id="userHeight" placeholder="cm" min="50" max="250">
+                        </div>
+                        <div class="form-group">
+                            <label for="userWeight">Weight (kg)</label>
+                            <input type="number" id="userWeight" placeholder="kg" min="1" max="500">
+                        </div>
+                        <div class="form-group">
+                            <label for="lifestyle">Lifestyle</label>
+                            <textarea id="lifestyle" placeholder="E.g., smoking, exercise, diet" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Existing Conditions</label>
+                            <div class="symptoms-list">
+                                <div class="symptom-item"><input type="checkbox" id="condition1" value="Diabetes"><label for="condition1">Diabetes</label></div>
+                                <div class="symptom-item"><input type="checkbox" id="condition2" value="Hypertension"><label for="condition2">Hypertension</label></div>
+                                <div class="symptom-item"><input type="checkbox" id="condition3" value="Asthma"><label for="condition3">Asthma</label></div>
+                                <div class="symptom-item"><input type="checkbox" id="condition4" value="Heart Disease"><label for="condition4">Heart Disease</label></div>
+                                <div class="symptom-item"><input type="checkbox" id="condition5" value="Thyroid Issues"><label for="condition5">Thyroid Issues</label></div>
+                            </div>
+                        </div>
+                        <div class="bmi-calculator">
+                            <h3>BMI Calculator</h3>
+                            <div class="bmi-result" id="bmiResult">Fill in height and weight to calculate BMI</div>
+                        </div>
+                        <div class="actions">
+                            <button type="button" class="btn btn-secondary" id="saveProfileBtn">Save Profile</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-pills"></i> Medication Reminders</h2>
+                    <div id="medicationList" class="reminder-list">
+                        <p>No medications added yet.</p>
+                    </div>
+                    <form id="addMedicationForm" style="margin-top: 20px;">
+                        <div class="form-group">
+                            <label for="medicationName">Medication Name</label>
+                            <input type="text" id="medicationName" placeholder="Enter medication name">
+                        </div>
+                        <div class="form-group">
+                            <label for="medicationTime">Time</label>
+                            <input type="time" id="medicationTime">
+                        </div>
+                        <div class="form-group">
+                            <label for="medicationDosage">Dosage</label>
+                            <input type="text" id="medicationDosage" placeholder="e.g., 1 pill">
+                        </div>
+                        <div class="form-group">
+                            <label for="medicationFrequency">Frequency</label>
+                            <select id="medicationFrequency">
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="as-needed">As Needed</option>
+                            </select>
+                        </div>
+                        <div class="actions">
+                            <button type="button" class="btn btn-primary" id="addMedicationBtn">Add Medication</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card health-tips">
+                    <h2 class="card-title"><i class="fas fa-leaf"></i> Daily Health Tips</h2>
+                    <div id="healthTips"></div>
+                </div>
+            </aside>
+
+            <section class="main-content">
+                <div class="tab-navigation">
+                    <div class="tab-item active" data-tab="symptoms">Symptom Checker</div>
+                    <div class="tab-item" data-tab="recommendations">Recommendations</div>
+                    <div class="tab-item" data-tab="history">History</div>
+                    <div class="tab-item" data-tab="health-data">Health Data</div>
+                    <div class="tab-item" data-tab="chat">AI Chat</div>
+                </div>
+
+                <div id="symptomsTab" class="tab-content active">
+                    <div class="card">
+                        <h2 class="card-title"><i class="fas fa-clipboard-list"></i> Symptom Checker</h2>
+                        <p>Select the symptoms you are experiencing or use voice input:</p>
+                        <div class="symptoms-list">
+                            <div class="symptom-item"><input type="checkbox" id="symptom1" value="Headache"><label for="symptom1">Headache</label></div>
+                            <div class="symptom-item"><input type="checkbox" id="symptom2" value="Fever"><label for="symptom2">Fever</label></div>
+                            <div class="symptom-item"><input type="checkbox" id="symptom3" value="Cough"><label for="symptom3">Cough</label></div>
+                            <div class="symptom-item"><input type="checkbox" id="symptom4" value="Fatigue"><label for="symptom4">Fatigue</label></div>
+                            <div class="symptom-item"><input type="checkbox" id="symptom5" value="Shortness of Breath"><label for="symptom5">Shortness of Breath</label></div>
+                            <div class="symptom-item"><input type="checkbox" id="symptom6" value="Sore Throat"><label for="symptom6">Sore Throat</label></div>
+                            <div class="symptom-item"><input type="checkbox" id="symptom7" value="Nausea"><label for="symptom7">Nausea</label></div>
+                            <div class="symptom-item"><input type="checkbox" id="symptom8" value="Diarrhea"><label for="symptom8">Diarrhea</label></div>
+                            <div class="symptom-item"><input type="checkbox" id="symptom9" value="Joint Pain"><label for="symptom9">Joint Pain</label></div>
+                            <div class="symptom-item"><input type="checkbox" id="symptom10" value="Chest Pain"><label for="symptom10">Chest Pain</label></div>
+                            <div class="symptom-item"><input type="checkbox" id="symptom11" value="Dizziness"><label for="symptom11">Dizziness</label></div>
+                            <div class="symptom-item"><input type="checkbox" id="symptom12" value="Abdominal Pain"><label for="symptom12">Abdominal Pain</label></div>
+                            <div class="symptom-item"><input type="checkbox" id="symptom13" value="Rash"><label for="symptom13">Rash</label></div>
+                            <div class="symptom-item"><input type="checkbox" id="symptom14" value="Vomiting"><label for="symptom14">Vomiting</label></div>
+                            <div class="symptom-item"><input type="checkbox" id="symptom15" value="Muscle Aches"><label for="symptom15">Muscle Aches</label></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="symptomDetails">Additional Details</label>
+                            <textarea id="symptomDetails" placeholder="Describe your symptoms in detail" rows="4"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="symptomDuration">Duration of Symptoms</label>
+                            <select id="symptomDuration">
+                                <option value="1">Less than 24 hours</option>
+                                <option value="2">1-3 days</option>
+                                <option value="3">3-7 days</option>
+                                <option value="4">1-2 weeks</option>
+                                <option value="5">More than 2 weeks</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="symptomSeverity">Severity</label>
+                            <select id="symptomSeverity">
+                                <option value="1">Mild</option>
+                                <option value="2">Moderate</option>
+                                <option value="3">Severe</option>
+                            </select>
+                        </div>
+                        <div class="actions">
+                            <button type="button" class="btn btn-primary" id="analyzeBtn">Analyze Symptoms</button>
+                        </div>
+                    </div>
+                    <div id="loader" class="loader">
+                        <div class="loader-spinner"></div>
+                        <p>Analyzing your symptoms...</p>
+                    </div>
+                </div>
+
+                <div id="recommendationsTab" class="tab-content">
+                    <div class="card recommendations-section">
+                        <h2 class="card-title"><i class="fas fa-heartbeat"></i> Health Recommendations</h2>
+                        <div id="recommendationsList">
+                            <p>Complete your profile and analyze symptoms to get personalized recommendations.</p>
+                        </div>
+                        <div class="actions" style="margin-top: 25px;">
+                            <button type="button" class="btn btn-secondary" id="printRecommendationsBtn">
+                                <i class="fas fa-print"></i> Print
+                            </button>
+                            <button type="button" class="btn btn-primary" id="saveRecommendationsBtn">
+                                <i class="fas fa-save"></i> Save to History
+                            </button>
+                            <button type="button" class="btn btn-primary" id="shareRecommendationsBtn">
+                                <i class="fas fa-share"></i> Share
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="historyTab" class="tab-content">
+                    <div class="card history-section">
+                        <h2 class="card-title"><i class="fas fa-history"></i> Health Check History</h2>
+                        <div id="historyList">
+                            <p>No history records found.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="healthDataTab" class="tab-content">
+                    <div class="card health-data-section">
+                        <h2 class="card-title"><i class="fas fa-chart-line"></i> Health Metrics</h2>
+                        <canvas id="healthMetricsChart" class="health-metrics-chart"></canvas>
+                        <div class="form-group" style="margin-top: 25px;">
+                            <label for="bloodPressure">Blood Pressure (mmHg)</label>
+                            <input type="text" id="bloodPressure" placeholder="e.g., 120/80">
+                        </div>
+                        <div class="form-group">
+                            <label for="bloodSugar">Blood Sugar (mg/dL)</label>
+                            <input type="number" id="bloodSugar" placeholder="mg/dL">
+                        </div>
+                        <div class="form-group">
+                            <label for="cholesterol">Cholesterol (mg/dL)</label>
+                            <input type="number" id="cholesterol" placeholder="mg/dL">
+                        </div>
+                        <div class="form-group">
+                            <label for="heartRate">Heart Rate (bpm)</label>
+                            <input type="number" id="heartRate" placeholder="bpm">
+                        </div>
+                        <div class="form-group">
+                            <label for="activityLevel">Activity Level (steps/day)</label>
+                            <input type="number" id="activityLevel" placeholder="Steps">
+                        </div>
+                        <div class="actions">
+                            <button type="button" class="btn btn-primary" id="saveHealthDataBtn">Save Data</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="chatTab" class="tab-content">
+                    <div class="card chat-section">
+                        <h2 class="card-title"><i class="fas fa-robot"></i> AI Health Assistant</h2>
+                        <div class="chat-messages" id="chatMessages"></div>
+                        <div class="chat-input">
+                            <input type="text" id="chatInput" placeholder="Ask a health question...">
+                            <button type="button" class="btn btn-primary" onclick="sendChatMessage()">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="notification" class="notification">
+        Notification message here
+    </div>
+
+    <div class="ai-assistant" id="aiAssistant" title="AI Assistant">
+        <i class="fas fa-robot"></i>
+    </div>
+
+    <script>
+        // DOM elements
+        const themeToggle = document.getElementById('themeToggle');
+        const voiceToggle = document.getElementById('voiceToggle');
+        const normalFontBtn = document.getElementById('normalFont');
+        const largeFontBtn = document.getElementById('largeFont');
+        const xLargeFontBtn = document.getElementById('xLargeFont');
+        const langEnBtn = document.getElementById('langEn');
+        const langEsBtn = document.getElementById('langEs');
+        const langFrBtn = document.getElementById('langFr');
+        const userHeightInput = document.getElementById('userHeight');
+        const userWeightInput = document.getElementById('userWeight');
+        const bmiResultDiv = document.getElementById('bmiResult');
+        const saveProfileBtn = document.getElementById('saveProfileBtn');
+        const addMedicationBtn = document.getElementById('addMedicationBtn');
+        const medicationList = document.getElementById('medicationList');
+        const tabItems = document.querySelectorAll('.tab-item');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const loader = document.getElementById('loader');
+        const recommendationsList = document.getElementById('recommendationsList');
+        const printRecommendationsBtn = document.getElementById('printRecommendationsBtn');
+        const saveRecommendationsBtn = document.getElementById('saveRecommendationsBtn');
+        const shareRecommendationsBtn = document.getElementById('shareRecommendationsBtn');
+        const historyList = document.getElementById('historyList');
+        const saveHealthDataBtn = document.getElementById('saveHealthDataBtn');
+        const healthTipsDiv = document.getElementById('healthTips');
+        const aiAssistant = document.getElementById('aiAssistant');
+        const notificationDiv = document.getElementById('notification');
+        const chatInput = document.getElementById('chatInput');
+        const chatMessages = document.getElementById('chatMessages');
+
+        // Chart initialization
+        let healthMetricsChart;
+        const healthMetricsChartCtx = document.getElementById('healthMetricsChart').getContext('2d');
+
+        // Speech recognition
+        let recognition;
+        if ('webkitSpeechRecognition' in window) {
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+        }
+
+        // Language translations
+        const translations = {
+            en: {
+                title: 'Smart Health Advisor',
+                profile: 'User Profile',
+                saveProfile: 'Save Profile',
+                medication: 'Medication Reminders',
+                addMedication: 'Add Medication',
+                symptoms: 'Symptom Checker',
+                analyze: 'Analyze Symptoms',
+                recommendations: 'Health Recommendations',
+                history: 'Health Check History',
+                healthData: 'Health Metrics',
+                chat: 'AI Health Assistant',
+                bmi: 'BMI Calculator',
+                healthTips: 'Daily Health Tips',
+                print: 'Print',
+                save: 'Save to History',
+                share: 'Share'
+            },
+            es: {
+                title: 'Asesor de Salud Inteligente',
+                profile: 'Perfil de Usuario',
+                saveProfile: 'Guardar Perfil',
+                medication: 'Recordatorios de Medicación',
+                addMedication: 'Agregar Medicación',
+                symptoms: 'Comprobador de Síntomas',
+                analyze: 'Analizar Síntomas',
+                recommendations: 'Recomendaciones de Salud',
+                history: 'Historial de Chequeos',
+                healthData: 'Métricas de Salud',
+                chat: 'Asistente de Salud IA',
+                bmi: 'Calculadora de IMC',
+                healthTips: 'Consejos Diarios de Salud',
+                print: 'Imprimir',
+                save: 'Guardar en Historial',
+                share: 'Compartir'
+            },
+            fr: {
+                title: 'Conseiller Santé Intelligent',
+                profile: 'Profil Utilisateur',
+                saveProfile: 'Enregistrer le Profil',
+                medication: 'Rappels de Médicaments',
+                addMedication: 'Ajouter un Médicament',
+                symptoms: 'Vérificateur de Symptômes',
+                analyze: 'Analyser les Symptômes',
+                recommendations: 'Recommandations de Santé',
+                history: 'Historique des Contrôles',
+                healthData: 'Métriques de Santé',
+                chat: 'Assistant Santé IA',
+                bmi: 'Calculateur d’IMC',
+                healthTips: 'Conseils de Santé Quotidiens',
+                print: 'Imprimer',
+                save: 'Enregistrer dans l’Historique',
+                share: 'Partager'
+            }
+        };
+
+        // Initialize application
+        function initApp() {
+            setupEventListeners();
+            loadUserProfile();
+            loadMedications();
+            loadHealthHistory();
+            calculateBMI();
+            initHealthMetricsChart();
+            checkMedicationReminders();
+            displayHealthTips();
+            setLanguage('en');
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            themeToggle.addEventListener('click', toggleTheme);
+            voiceToggle.addEventListener('click', toggleVoiceInput);
+            normalFontBtn.addEventListener('click', () => setFontSize('normal'));
+            largeFontBtn.addEventListener('click', () => setFontSize('large'));
+            xLargeFontBtn.addEventListener('click', () => setFontSize('x-large'));
+            langEnBtn.addEventListener('click', () => setLanguage('en'));
+            langEsBtn.addEventListener('click', () => setLanguage('es'));
+            langFrBtn.addEventListener('click', () => setLanguage('fr'));
+            userHeightInput.addEventListener('input', calculateBMI);
+            userWeightInput.addEventListener('input', calculateBMI);
+            saveProfileBtn.addEventListener('click', saveUserProfile);
+            addMedicationBtn.addEventListener('click', addMedication);
+            tabItems.forEach(tab => tab.addEventListener('click', () => switchTab(tab.dataset.tab)));
+            analyzeBtn.addEventListener('click', analyzeSymptoms);
+            printRecommendationsBtn.addEventListener('click', printRecommendations);
+            saveRecommendationsBtn.addEventListener('click', saveToHistory);
+            shareRecommendationsBtn.addEventListener('click', shareRecommendations);
+            saveHealthDataBtn.addEventListener('click', saveHealthData);
+            aiAssistant.addEventListener('click', () => switchTab('chat'));
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendChatMessage();
+            });
+        }
+
+        // Toggle theme
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            themeToggle.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+            localStorage.setItem('darkMode', isDarkMode);
+        }
+
+        // Toggle voice input
+        function toggleVoiceInput() {
+            if (!recognition) {
+                showNotification('Voice input not supported in this browser!', 'error');
+                return;
+            }
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById('symptomDetails').value += transcript + '\n';
+                showNotification('Voice input recorded!');
+            };
+
+            recognition.onerror = () => {
+                showNotification('Error with voice input!', 'error');
+            };
+
+            recognition.start();
+            showNotification('Voice input started. Speak now...');
+        }
+
+        // Set font size
+        function setFontSize(size) {
+            document.body.classList.remove('large-font', 'x-large-font');
+            if (size === 'large') document.body.classList.add('large-font');
+            if (size === 'x-large') document.body.classList.add('x-large-font');
+            [normalFontBtn, largeFontBtn, xLargeFontBtn].forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`${size}Font`).classList.add('active');
+            localStorage.setItem('fontSize', size);
+        }
+
+        // Set language
+        function setLanguage(lang) {
+            const t = translations[lang];
+            document.querySelector('.logo h1').textContent = t.title;
+            document.querySelector('.card-title:has(.fa-user-circle)').textContent = t.profile;
+            saveProfileBtn.textContent = t.saveProfile;
+            document.querySelector('.card-title:has(.fa-pills)').textContent = t.medication;
+            addMedicationBtn.textContent = t.addMedication;
+            document.querySelector('.tab-item[data-tab="symptoms"]').textContent = t.symptoms;
+            analyzeBtn.textContent = t.analyze;
+            document.querySelector('.tab-item[data-tab="recommendations"]').textContent = t.recommendations;
+            document.querySelector('.tab-item[data-tab="history"]').textContent = t.history;
+            document.querySelector('.tab-item[data-tab="health-data"]').textContent = t.healthData;
+            document.querySelector('.tab-item[data-tab="chat"]').textContent = t.chat;
+            document.querySelector('.bmi-calculator h3').textContent = t.bmi;
+            document.querySelector('.card-title:has(.fa-leaf)').textContent = t.healthTips;
+            printRecommendationsBtn.innerHTML = `<i class="fas fa-print"></i> ${t.print}`;
+            saveRecommendationsBtn.innerHTML = `<i class="fas fa-save"></i> ${t.save}`;
+            shareRecommendationsBtn.innerHTML = `<i class="fas fa-share"></i> ${t.share}`;
+            [langEnBtn, langEsBtn, langFrBtn].forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`lang${lang.toUpperCase()}`).classList.add('active');
+            localStorage.setItem('language', lang);
+        }
+
+        // Calculate BMI
+        function calculateBMI() {
+            const height = parseFloat(userHeightInput.value) / 100;
+            const weight = parseFloat(userWeightInput.value);
+            if (height > 0 && weight > 0) {
+                const bmi = weight / (height * height);
+                let bmiCategory = '';
+                let bmiColor = '';
+                if (bmi < 18.5) {
+                    bmiCategory = 'Underweight';
+                    bmiColor = 'var(--warning)';
+                } else if (bmi < 25) {
+                    bmiCategory = 'Normal weight';
+                    bmiColor = 'var(--secondary)';
+                } else if (bmi < 30) {
+                    bmiCategory = 'Overweight';
+                    bmiColor = 'var(--warning)';
+                } else {
+                    bmiCategory = 'Obese';
+                    bmiColor = 'var(--danger)';
+                }
+                bmiResultDiv.innerHTML = `BMI: <strong>${bmi.toFixed(1)}</strong> - <span style="color: ${bmiColor}">${bmiCategory}</span>`;
+            } else {
+                bmiResultDiv.innerHTML = 'Fill in your height and weight to calculate BMI';
+            }
+        }
+
+        // Save user profile
+        function saveUserProfile() {
+            const userProfile = {
+                name: document.getElementById('userName').value,
+                age: document.getElementById('userAge').value,
+                gender: document.getElementById('userGender').value,
+                height: document.getElementById('userHeight').value,
+                weight: document.getElementById('userWeight').value,
+                lifestyle: document.getElementById('lifestyle').value,
+                conditions: Array.from(document.querySelectorAll('[id^="condition"]:checked')).map(c => c.value),
+                lastUpdated: new Date().toISOString()
+            };
+            localStorage.setItem('userProfile', JSON.stringify(userProfile));
+            showNotification('Profile saved successfully!');
+        }
+
+        // Load user profile
+        function loadUserProfile() {
+            const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+            document.getElementById('userName').value = userProfile.name || '';
+            document.getElementById('userAge').value = userProfile.age || '';
+            document.getElementById('userGender').value = userProfile.gender || '';
+            document.getElementById('userHeight').value = userProfile.height || '';
+            document.getElementById('userWeight').value = userProfile.weight || '';
+            document.getElementById('lifestyle').value = userProfile.lifestyle || '';
+            (userProfile.conditions || []).forEach(condition => {
+                const checkbox = document.querySelector(`[value="${condition}"]`);
+                if (checkbox) checkbox.checked = true;
+            });
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.body.classList.add('dark-mode');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            }
+            const fontSize = localStorage.getItem('fontSize');
+            if (fontSize) setFontSize(fontSize);
+            const lang = localStorage.getItem('language') || 'en';
+            setLanguage(lang);
+        }
+
+        // Add medication
+        function addMedication() {
+            const medication = {
+                id: Date.now(),
+                name: document.getElementById('medicationName').value.trim(),
+                time: document.getElementById('medicationTime').value,
+                dosage: document.getElementById('medicationDosage').value.trim(),
+                frequency: document.getElementById('medicationFrequency').value,
+                created: new Date().toISOString()
+            };
+            if (!medication.name || !medication.time) {
+                showNotification('Please enter medication name and time!', 'error');
+                return;
+            }
+            const medications = getMedications();
+            medications.push(medication);
+            localStorage.setItem('medications', JSON.stringify(medications));
+            document.getElementById('medicationName').value = '';
+            document.getElementById('medicationTime').value = '';
+            document.getElementById('medicationDosage').value = '';
+            loadMedications();
+            showNotification('Medication reminder added!');
+        }
+
+        // Get medications
+        function getMedications() {
+            return JSON.parse(localStorage.getItem('medications') || '[]');
+        }
+
+        // Load medications
+        function loadMedications() {
+            const medications = getMedications();
+            if (medications.length === 0) {
+                medicationList.innerHTML = '<p>No medications added yet.</p>';
+                return;
+            }
+            medications.sort((a, b) => a.time.localeCompare(b.time));
+            medicationList.innerHTML = medications.map(med => `
+                <div class="reminder-item">
+                    <div>
+                        <strong>${med.name}</strong>
+                        ${med.dosage ? `<span>(${med.dosage})</span>` : ''}
+                        <small>(${med.frequency})</small>
+                    </div>
+                    <span class="reminder-time">${formatTime(med.time)}</span>
+                    <button class="btn btn-danger" onclick="removeMedication(${med.id})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Remove medication
+        function removeMedication(id) {
+            const medications = getMedications().filter(med => med.id !== id);
+            localStorage.setItem('medications', JSON.stringify(medications));
+            loadMedications();
+            showNotification('Medication removed!');
+        }
+
+        // Check medication reminders
+        function checkMedicationReminders() {
+            const medications = getMedications();
+            const now = new Date();
+            const currentHour = now.getHours();
+            const currentMinute = now.getMinutes();
+            medications.forEach(med => {
+                const [medHour, medMinute] = med.time.split(':').map(Number);
+                if (med.frequency === 'daily' &&
+                    currentHour === medHour &&
+                    currentMinute >= medMinute &&
+                    currentMinute <= medMinute + 5) {
+                    showNotification(`Time to take ${med.name}!`, 'reminder');
+                }
+            });
+            setTimeout(checkMedicationReminders, 60000);
+        }
+
+        // Format time
+        function formatTime(timeString) {
+            const [hours, minutes] = timeString.split(':');
+            const hour = parseInt(hours, 10);
+            const period = hour >= 12 ? 'PM' : 'AM';
+            const displayHour = hour % 12 || 12;
+            return `${displayHour}:${minutes} ${period}`;
+        }
+
+        // Switch tabs
+        function switchTab(tabName) {
+            tabItems.forEach(tab => tab.classList.toggle('active', tab.dataset.tab === tabName));
+            tabContents.forEach(content => content.classList.toggle('active', content.id === `${tabName}Tab`));
+        }
+
+        // Analyze symptoms
+        async function analyzeSymptoms() {
+            const selectedSymptoms = Array.from(document.querySelectorAll('[id^="symptom"]:checked')).map(s => s.value);
+            if (selectedSymptoms.length === 0) {
+                showNotification('Please select at least one symptom!', 'error');
+                return;
+            }
+            const duration = document.getElementById('symptomDuration').value;
+            const severity = document.getElementById('symptomSeverity').value;
+            const details = document.getElementById('symptomDetails').value;
+            loader.style.display = 'block';
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            loader.style.display = 'none';
+            const recommendations = generateRecommendations(selectedSymptoms, duration, severity, details);
+            switchTab('recommendations');
+            displayRecommendations(recommendations);
+        }
+
+        // Generate recommendations
+        function generateRecommendations(symptoms, duration, severity, details) {
+            const recommendations = [];
+            const possibleConditions = identifyPossibleConditions(symptoms);
+            possibleConditions.forEach(condition => {
+                recommendations.push({
+                    type: 'condition',
+                    title: `Possible ${condition.name}`,
+                    text: condition.description,
+                    urgency: condition.urgency
+                });
+            });
+            symptoms.forEach(symptom => {
+                recommendations.push({
+                    type: 'symptom',
+                    title: `For ${symptom}`,
+                    text: getRemediesForSymptom(symptom),
+                    urgency: 'low'
+                });
+            });
+            if (details.toLowerCase().includes('smoking')) {
+                recommendations.push({
+                    type: 'lifestyle',
+                    title: 'Smoking Cessation',
+                    text: 'Consider quitting smoking to improve your health. Resources like nicotine patches or counseling can help.',
+                    urgency: 'medium'
+                });
+            }
+            if (severity === '3' && possibleConditions.some(c => c.urgency === 'high')) {
+                recommendations.unshift({
+                    type: 'urgent',
+                    title: 'Seek Medical Attention',
+                    text: 'Based on your symptoms and their severity, we recommend consulting a healthcare professional immediately.',
+                    urgency: 'high'
+                });
+            }
+            recommendations.push({
+                type: 'lifestyle',
+                title: 'General Health Recommendations',
+                text: 'Stay hydrated, get adequate rest, and maintain a balanced diet to support your immune system.',
+                urgency: 'low'
+            });
+            return recommendations;
+        }
+
+        // Identify possible conditions
+        function identifyPossibleConditions(symptoms) {
+            const conditions = [];
+            if (symptoms.includes('Cough') && symptoms.includes('Sore Throat') && (symptoms.includes('Headache') || symptoms.includes('Fever'))) {
+                conditions.push({
+                    name: 'Common Cold',
+                    description: 'Rest, stay hydrated, and consider over-the-counter cold medications for symptom relief.',
+                    urgency: 'low'
+                });
+            }
+            if (symptoms.includes('Fever') && symptoms.includes('Fatigue') && (symptoms.includes('Muscle Aches') || symptoms.includes('Headache'))) {
+                conditions.push({
+                    name: 'Flu (Influenza)',
+                    description: 'Rest, take fluids, and consider antiviral medications if diagnosed within 48 hours.',
+                    urgency: 'medium'
+                });
+            }
+            if ((symptoms.includes('Fever') || symptoms.includes('Cough')) && (symptoms.includes('Fatigue') || symptoms.includes('Shortness of Breath'))) {
+                conditions.push({
+                    name: 'COVID-19',
+                    description: 'Consider getting tested and follow isolation guidelines.',
+                    urgency: 'medium'
+                });
+            }
+            if (symptoms.includes('Headache') && (symptoms.includes('Nausea') || symptoms.includes('Dizziness'))) {
+                conditions.push({
+                    name: 'Migraine',
+                    description: 'Rest in a dark, quiet room and consider migraine-specific medication.',
+                    urgency: 'low'
+                });
+            }
+            if ((symptoms.includes('Nausea') || symptoms.includes('Vomiting')) && symptoms.includes('Diarrhea')) {
+                conditions.push({
+                    name: 'Gastroenteritis',
+                    description: 'Stay hydrated and follow the BRAT diet (bananas, rice, applesauce, toast).',
+                    urgency: 'medium'
+                });
+            }
+            if (symptoms.includes('Rash') && (symptoms.includes('Shortness of Breath') || symptoms.includes('Sore Throat'))) {
+                conditions.push({
+                    name: 'Allergic Reaction',
+                    description: 'Avoid potential allergens and consider antihistamines.',
+                    urgency: 'medium'
+                });
+            }
+            if (symptoms.includes('Chest Pain')) {
+                conditions.push({
+                    name: 'Cardiac Issue',
+                    description: 'Chest pain can indicate a serious cardiac issue. Seek immediate medical attention.',
+                    urgency: 'high'
+                });
+            }
+            if (symptoms.includes('Shortness of Breath') && document.getElementById('symptomSeverity').value === '3') {
+                conditions.push({
+                    name: 'Respiratory Distress',
+                    description: 'Severe shortness of breath requires immediate medical attention.',
+                    urgency: 'high'
+                });
+            }
+            return conditions;
+        }
+
+        // Get remedies for symptom
+        function getRemediesForSymptom(symptom) {
+            const remedies = {
+                'Headache': 'Take over-the-counter pain relievers, stay hydrated, and rest in a quiet room.',
+                'Fever': 'Use acetaminophen or ibuprofen, apply cool compresses, and stay hydrated.',
+                'Cough': 'Use honey, stay hydrated, and consider cough suppressants or expectorants.',
+                'Fatigue': 'Ensure adequate rest, maintain nutrition, and stay hydrated.',
+                'Shortness of Breath': 'Use breathing techniques and seek medical help if severe.',
+                'Sore Throat': 'Gargle with salt water, use lozenges, and drink warm liquids.',
+                'Nausea': 'Try ginger tea, eat small meals, and stay hydrated.',
+                'Diarrhea': 'Stay hydrated with electrolytes and follow the BRAT diet.',
+                'Joint Pain': 'Rest, apply ice or heat, and use pain relievers.',
+                'Chest Pain': 'Seek emergency care immediately.',
+                'Dizziness': 'Sit or lie down, stay hydrated, and avoid sudden movements.',
+                'Abdominal Pain': 'Use a heating pad, avoid trigger foods, and seek medical attention if severe.',
+                'Rash': 'Use antihistamines or hydrocortisone cream and avoid scratching.',
+                'Vomiting': 'Take small sips of clear liquids and avoid solid foods.',
+                'Muscle Aches': 'Rest, apply heat, and use pain relievers.'
+            };
+            return remedies[symptom] || 'Consult a healthcare provider for specific advice.';
+        }
+
+        // Display recommendations
+        function displayRecommendations(recommendations) {
+            let html = '';
+            const urgentRecs = recommendations.filter(rec => rec.urgency === 'high');
+            if (urgentRecs.length > 0) {
+                html += '<div style="background-color: #ffebee; padding: 20px; border-radius: 8px; margin-bottom: 25px; border-left: 5px solid var(--danger);">';
+                urgentRecs.forEach(rec => {
+                    html += `
+                        <div class="recommendation-item" style="border-color: var(--danger); background-color: #ffebee;">
+                            <h3 class="recommendation-title" style="color: var(--danger);">${rec.title}</h3>
+                            <p class="recommendation-text">${rec.text}</p>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            }
+            const otherRecs = recommendations.filter(rec => rec.urgency !== 'high');
+            otherRecs.forEach(rec => {
+                const borderColor = rec.urgency === 'medium' ? 'var(--warning)' : 'var(--primary)';
+                const bgColor = rec.urgency === 'medium' ? '#fff8e1' : '#f3f8ff';
+                html += `
+                    <div class="recommendation-item" style="border-color: ${borderColor}; background-color: ${bgColor};">
+                        <h3 class="recommendation-title" style="color: ${borderColor};">${rec.title}</h3>
+                        <p class="recommendation-text">${rec.text}</p>
+                    </div>
+                `;
+            });
+            html += `
+                <div style="margin-top: 30px; font-size: 0.9rem; color: var(--gray); border-top: 1px solid #eee; padding-top: 20px;">
+                    <p><strong>Disclaimer:</strong> This is not a substitute for professional medical advice. Consult a healthcare provider for accurate diagnosis and treatment.</p>
+                </div>
+            `;
+            recommendationsList.innerHTML = html;
+            sessionStorage.setItem('currentRecommendations', JSON.stringify(recommendations));
+        }
+
+        // Print recommendations
+        function printRecommendations() {
+            window.print();
+        }
+
+        // Share recommendations
+        function shareRecommendations() {
+            const recommendations = JSON.parse(sessionStorage.getItem('currentRecommendations') || '[]');
+            if (recommendations.length === 0) {
+                showNotification('No recommendations to share!', 'error');
+                return;
+            }
+            const shareText = recommendations.map(rec => `${rec.title}: ${rec.text}`).join('\n\n');
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Health Recommendations',
+                    text: shareText
+                }).then(() => showNotification('Recommendations shared!'))
+                  .catch(() => showNotification('Error sharing recommendations!', 'error'));
+            } else {
+                navigator.clipboard.writeText(shareText)
+                    .then(() => showNotification('Recommendations copied to clipboard!'))
+                    .catch(() => showNotification('Error copying recommendations!', 'error'));
+            }
+        }
+
+        // Save to history
+        function saveToHistory() {
+            const recommendations = JSON.parse(sessionStorage.getItem('currentRecommendations') || '[]');
+            if (recommendations.length === 0) {
+                showNotification('No recommendations to save!', 'error');
+                return;
+            }
+            const selectedSymptoms = Array.from(document.querySelectorAll('[id^="symptom"]:checked')).map(s => s.value);
+            const historyRecords = getHistoryRecords();
+            historyRecords.push({
+                id: Date.now(),
+                date: new Date().toISOString(),
+                symptoms: selectedSymptoms,
+                details: document.getElementById('symptomDetails').value,
+                recommendations
+            });
+            localStorage.setItem('healthHistory', JSON.stringify(historyRecords));
+            loadHealthHistory();
+            showNotification('Recommendations saved to history!');
+        }
+
+        // Get history records
+        function getHistoryRecords() {
+            return JSON.parse(localStorage.getItem('healthHistory') || '[]');
+        }
+
+        // Load health history
+        function loadHealthHistory() {
+            const history = getHistoryRecords();
+            if (history.length === 0) {
+                historyList.innerHTML = '<p>No history records found.</p>';
+                return;
+            }
+            history.sort((a, b) => new Date(b.date) - new Date(a.date));
+            historyList.innerHTML = history.map(record => {
+                const date = new Date(record.date);
+                return `
+                    <div class="history-item" onclick="viewHistoryRecord(${record.id})">
+                        <h3>${record.symptoms.join(', ')}</h3>
+                        <p>${record.details.slice(0, 100)}${record.details.length > 100 ? '...' : ''}</p>
+                        <div class="history-date">${date.toLocaleString()}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // View history record
+        function viewHistoryRecord(id) {
+            const record = getHistoryRecords().find(rec => rec.id === id);
+            if (record) {
+                sessionStorage.setItem('currentRecommendations', JSON.stringify(record.recommendations));
+                switchTab('recommendations');
+                displayRecommendations(record.recommendations);
+            }
+        }
+
+        // Initialize health metrics chart
+        function initHealthMetricsChart() {
+            const healthData = getHealthData();
+            const dates = healthData.map(data => new Date(data.date).toLocaleDateString());
+            const bpSystolic = healthData.map(data => data.bloodPressure.split('/')[0] || null);
+            const bpDiastolic = healthData.map(data => data.bloodPressure.split('/')[1] || null);
+            const bloodSugar = healthData.map(data => data.bloodSugar);
+            const heartRate = healthData.map(data => data.heartRate);
+            const activityLevel = healthData.map(data => data.activityLevel);
+            if (healthMetricsChart) healthMetricsChart.destroy();
+            healthMetricsChart = new Chart(healthMetricsChartCtx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [
+                        { label: 'Systolic BP', data: bpSystolic, borderColor: 'rgb(255, 99, 132)', backgroundColor: 'rgba(255, 99, 132, 0.1)', tension: 0.1 },
+                        { label: 'Diastolic BP', data: bpDiastolic, borderColor: 'rgb(75, 192, 192)', backgroundColor: 'rgba(75, 192, 192, 0.1)', tension: 0.1 },
+                        { label: 'Blood Sugar', data: bloodSugar, borderColor: 'rgb(255, 159, 64)', backgroundColor: 'rgba(255, 159, 64, 0.1)', tension: 0.1 },
+                        { label: 'Heart Rate', data: heartRate, borderColor: 'rgb(54, 162, 235)', backgroundColor: 'rgba(54, 162, 235, 0.1)', tension: 0.1 },
+                        { label: 'Activity (Steps)', data: activityLevel, borderColor: 'rgb(153, 102, 255)', backgroundColor: 'rgba(153, 102, 255, 0.1)', tension: 0.1 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: { y: { beginAtZero: false } },
+                    plugins: { legend: { position: 'top' } }
+                }
+            });
+        }
+
+        // Get health data
+        function getHealthData() {
+            return JSON.parse(localStorage.getItem('healthData') || '[]');
+        }
+
+        // Save health data
+        function saveHealthData() {
+            const healthData = getHealthData();
+            const newData = {
+                id: Date.now(),
+                date: new Date().toISOString(),
+                bloodPressure: document.getElementById('bloodPressure').value || 'N/A',
+                bloodSugar: document.getElementById('bloodSugar').value || null,
+                cholesterol: document.getElementById('cholesterol').value || null,
+                heartRate: document.getElementById('heartRate').value || null,
+                activityLevel: document.getElementById('activityLevel').value || null
+            };
+            if (!newData.bloodPressure && !newData.bloodSugar && !newData.cholesterol && !newData.heartRate && !newData.activityLevel) {
+                showNotification('Please enter at least one health metric!', 'error');
+                return;
+            }
+            healthData.push(newData);
+            localStorage.setItem('healthData', JSON.stringify(healthData));
+            document.getElementById('bloodPressure').value = '';
+            document.getElementById('bloodSugar').value = '';
+            document.getElementById('cholesterol').value = '';
+            document.getElementById('heartRate').value = '';
+            document.getElementById('activityLevel').value = '';
+            initHealthMetricsChart();
+            showNotification('Health data saved successfully!');
+        }
+
+        // Display health tips
+        function displayHealthTips() {
+            const tips = [
+                'Drink at least 8 glasses of water daily to stay hydrated.',
+                'Aim for 7-9 hours of sleep each night for optimal health.',
+                'Incorporate 30 minutes of physical activity most days of the week.',
+                'Eat a balanced diet rich in fruits, vegetables, and whole grains.',
+                'Practice mindfulness or meditation to reduce stress.'
+            ];
+            healthTipsDiv.innerHTML = tips.map(tip => `<div class="tip-item">${tip}</div>`).join('');
+        }
+
+        // Send chat message
+        async function sendChatMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+            chatMessages.innerHTML += `<div class="chat-message user-message">${message}</div>`;
+            chatInput.value = '';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            const botMessage = document.createElement('div');
+            botMessage.className = 'chat-message bot-message';
+            botMessage.textContent = 'Thinking...';
+            chatMessages.appendChild(botMessage);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            try {
+                const response = await chatbotRespond(message);
+                botMessage.textContent = response;
+            } catch (error) {
+                botMessage.textContent = 'Sorry, I encountered an error. Please try again.';
+            }
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Simulated chatbot response
+        async function chatbotRespond(message) {
+            await new Promise(resolve => setTimeout(resolve, 500));
+            if (message.toLowerCase().includes('diet')) {
+                return 'A balanced diet includes fruits, vegetables, lean proteins, and whole grains. Limit processed foods and sugars. Need specific recommendations?';
+            }
+            if (message.toLowerCase().includes('exercise')) {
+                return 'Aim for 150 minutes of moderate aerobic activity weekly, plus strength exercises twice a week. Any specific goals?';
+            }
+            return 'I’m here to help with health questions! Could you provide more details or ask about a specific topic?';
+        }
+
+        // Show notification
+        function showNotification(message, type = 'success') {
+            notificationDiv.textContent = message;
+            notificationDiv.style.backgroundColor = type === 'error' ? 'var(--danger)' : type === 'reminder' ? 'var(--warning)' : 'var(--primary)';
+            notificationDiv.classList.add('show');
+            setTimeout(() => notificationDiv.classList.remove('show'), 3000);
+        }
+
+        // Global functions for onclick
+        window.removeMedication = removeMedication;
+        window.viewHistoryRecord = viewHistoryRecord;
+        window.sendChatMessage = sendChatMessage;
+
+        // Initialize on DOM load
+        document.addEventListener('DOMContentLoaded', initApp);
+
+       
+    </script>
+</body>
+</html>
